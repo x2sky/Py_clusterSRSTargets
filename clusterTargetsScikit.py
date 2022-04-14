@@ -1,17 +1,17 @@
-# -*- clusterTargets -*-#
+# -*- clusterTargetsScikit -*-#
 """
 SYNOPSIS
     Function that reads the newest txt file that contains the SRS target information and compute the optimal clusters
     
 DESCRIPTION
     Function that reads the newest txt file that contains the SRS target information and compute the optimal clusters from 1 cluster to up to 3 clusters.
-    Both the min sum of square and the min max-dist methods are used.
+    The l1, l2 hierarchial and k-means clustering methods are used
     
 EXAMPLES
     Place the txt file in the same folder of the exe file or one directory up, and the program shall run.
 
-VERSION 0.1
-    Add terminal color
+VERSION 0.0
+    First functional version
 AUTHOR
     Becket Hui 2022/04
     
@@ -19,7 +19,7 @@ AUTHOR
 import glob, os, re, sys
 import numpy as np
 from classTarget import SRSTarget
-from classTargetCluster import SRSTargetCluster
+from classScikitCluster import SRSTargetCluster
 from termcolor import colored
 
 if __name__ == '__main__':
@@ -51,33 +51,42 @@ if __name__ == '__main__':
     tgtCl = SRSTargetCluster(srsTargets)
     for N_cl in range(1,min(4, tgtCl.N_target+1),1):  # calculate from 1 up to 3 or N_target clusters
         if N_cl == 1:
-            print(colored('Computing combination of targets with ', 'yellow') + colored(str(N_cl), 'green') + colored(' cluster.', 'yellow'))
-            tgtCl.Calc_Cluster_Sizes(N_cl)
-            tgtCl.Calc_Optimal_Cluster()
+            print(colored('Computing combination of targets with ' + str(N_cl) + ' cluster.', 'yellow'))
+            tgtCl.Calc_Optimal_Cluster(N_cl, 'kmeans')
             print('The optimal cluster is: ')
             print(tgtCl.optimal_cluster)
             print('The ' + colored('iso-center', 'green') + ' for the cluster is')
             print([iso.tolist() for iso in tgtCl.Get_IsoCenters()])
             print('The ' + colored('maximum distance', 'green') + ' from iso within the cluster is')
             print(tgtCl.Get_Max_Distance_From_Iso())
+            print('')
         else:
-            print(colored('Computing optimal ', 'yellow') + colored('Sum of Square', 'green') + colored(' combinations for targets with ', 'yellow') + colored(str(N_cl), 'green') + colored(' cluters.', 'yellow'))
-            tgtCl.Calc_Cluster_Sizes(N_cl)
-            tgtCl.Calc_Optimal_Cluster()
-            print('The optimal clusters are: ')
+            print(colored('Computing optimal combinations for targets with ' + str(N_cl) + ' cluters.', 'yellow'))
+            tgtCl.Calc_Optimal_Cluster(N_cl, 'hrchy2')
+            print('Using ' + colored('l2 hierarchical', 'green') + ' clustering, the optimal clusters are: ')
             print(tgtCl.optimal_cluster)
             print('The ' + colored('iso-center', 'green') + ' for each cluster is')
             print([iso.tolist() for iso in tgtCl.Get_IsoCenters()])
             print('The ' + colored('maximum distance', 'green') + ' from iso within each of the cluster is')
             print(tgtCl.Get_Max_Distance_From_Iso())
-            print(colored('Computing optimal ', 'yellow') + colored('Maximum-Distance to Iso', 'green') + colored(' combinations for targets with ', 'yellow') + colored(str(N_cl), 'green') + colored(' cluters.', 'yellow'))
-            tgtCl.Calc_Min_Max_Distance_Cluster()
-            print('The optimal clusters are: ')
+            print('')
+
+            tgtCl.Calc_Optimal_Cluster(N_cl, 'hrchy1')
+            print('Using ' + colored('l1 hierarchical', 'green') + ' clustering, the optimal clusters are: ')
             print(tgtCl.optimal_cluster)
             print('The ' + colored('iso-center', 'green') + ' for each cluster is')
             print([iso.tolist() for iso in tgtCl.Get_IsoCenters()])
             print('The ' + colored('maximum distance', 'green') + ' from iso within each of the cluster is')
             print(tgtCl.Get_Max_Distance_From_Iso())
-        print('')
+            print('')
+
+            tgtCl.Calc_Optimal_Cluster(N_cl, 'kmeans')
+            print('Using ' + colored('k-means hierarchical', 'green') + ' clustering, the optimal clusters are: ')
+            print(tgtCl.optimal_cluster)
+            print('The ' + colored('iso-center', 'green') + ' for each cluster is')
+            print([iso.tolist() for iso in tgtCl.Get_IsoCenters()])
+            print('The ' + colored('maximum distance', 'green') + ' from iso within each of the cluster is')
+            print(tgtCl.Get_Max_Distance_From_Iso())
+            print('')
     input('Hit Enter to Exit...')
     sys.exit()
